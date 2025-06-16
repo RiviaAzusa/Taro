@@ -1,0 +1,1 @@
+from langchain_qwq import ChatQwen
