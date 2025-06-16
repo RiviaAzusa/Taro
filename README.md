@@ -8,7 +8,6 @@
   ![Python](https://img.shields.io/badge/Python-3.13+-blue.svg)
   ![LangChain](https://img.shields.io/badge/LangChain-0.3.25+-green.svg)
   ![LangGraph](https://img.shields.io/badge/LangGraph-0.4.8+-orange.svg)
-  ![Async](https://img.shields.io/badge/架构-全异步-red.svg)
 </div>
 
 ## ✨ 项目简介
