@@ -1,3 +1,4 @@
+import os
 from easylark.conn.larkapi import EasyLarkAPI
 from .db_client import DatabaseClient
 
@@ -7,12 +8,44 @@ from lark_oapi.api.wiki.v2.model import Node
 Taro
 """
 
+
 class LarkSynchronizer:
     def __init__(self, lark_api: EasyLarkAPI, db_api: DatabaseClient):
         self.lark_api = lark_api
         self.db_api = db_api
 
-    async def fetch_all_folder_nodes(self): ...
+    async def get_wiki_nodes_content(self, space_id: str) -> list[tuple[str, str, str]]:
+        """
+        use wiki space_id to get all contents from database.
+        return: list[tuple[str, str, str]] (title, link, content)
+        """
+        if not self.db_api.connection:
+            await self.db_api.connect()
+
+        # Get tenant name from environment variable
+        tenant_name = os.getenv("TENANT_NAME", "ucnc29ltq5gu")  # fallback to example
+
+        # Query to get all documents in the space with their content
+        query = """
+        SELECT m.title, m.node_token, c.raw_content
+        FROM docs_metadata m
+        LEFT JOIN docs_content c ON m.obj_token = c.obj_token
+        WHERE m.space_id = ? AND c.raw_content IS NOT NULL
+        ORDER BY m.title
+        """
+
+        async with self.db_api.connection.cursor() as cursor:
+            await cursor.execute(query, (space_id,))
+            rows = await cursor.fetchall()
+
+        results = []
+        for row in rows:
+            title, node_token, raw_content = row
+            # Build the wiki link
+            wiki_link = f"https://{tenant_name}.feishu.cn/wiki/{node_token}"
+            results.append((title, wiki_link, raw_content))
+
+        return results
 
     async def fetch_all_wiki_nodes(
         self, space_id: str, parent_node_token: str = None, page_size: int = 20
@@ -77,11 +110,7 @@ class LarkSynchronizer:
                     node_data[field_name] = getattr(node, field_name)
 
             # Ensure critical fields are present
-            if (
-                not node.node_token
-                or not node.obj_token
-                or node.obj_edit_time is None
-            ):
+            if not node.node_token or not node.obj_token or node.obj_edit_time is None:
                 # print(f"Skipping node due to missing critical fields: {node.title}")
                 continue
 
@@ -91,9 +120,9 @@ class LarkSynchronizer:
             if existing_doc_meta:
                 # existing_doc_meta is a tuple (obj_edit_time,)
                 stored_obj_edit_time = existing_doc_meta[0]
-                if stored_obj_edit_time is not None and int(
-                    node.obj_edit_time
-                ) <= int(stored_obj_edit_time):
+                if stored_obj_edit_time is not None and int(node.obj_edit_time) <= int(
+                    stored_obj_edit_time
+                ):
                     needs_update = False
                     # print(f"Node {node.title} is up to date. DB: {stored_obj_edit_time}, Node: {node.obj_edit_time}")
 

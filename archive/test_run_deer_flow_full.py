@@ -79,6 +79,8 @@ async def run_agent_workflow_async(
     }
     current_message_len = 0
     print_status = {"plans": False, "final_report": False}
+    final_report = None  # 存储最终报告
+
     async for s in graph.astream(
         input=initial_state, config=config, stream_mode="values"
     ):
@@ -97,8 +99,9 @@ async def run_agent_workflow_async(
                         }
                     print_status["plans"] = True
                 if "final_report" in s and not print_status["final_report"]:
+                    final_report = s["final_report"]  # 保存最终报告
                     yield {"type": "tool_call", "text": "最终报告:"}
-                    yield {"type": "text", "text": s["final_report"]}
+                    yield {"type": "text", "text": final_report}
                     print_status["final_report"] = True
 
                 if "messages" in s:
@@ -114,19 +117,19 @@ async def run_agent_workflow_async(
                         # Parse message content to extract images and clean text
                         content = message.content
                         images = []
-                        
+
                         # Extract image links in ![alt](url) format
-                        image_pattern = r'!\[([^\]]*)\]\(([^)]+)\)'
+                        image_pattern = r"!\[([^\]]*)\]\(([^)]+)\)"
                         matches = re.findall(image_pattern, content)
-                        
+
                         for alt_text, url in matches:
                             images.append((alt_text, url))
-                        
+
                         # Remove image markdown from content
-                        cleaned_content = re.sub(image_pattern, '', content)
-                        
+                        cleaned_content = re.sub(image_pattern, "", content)
+
                         yield {"type": "text", "text": cleaned_content}
-                        
+
                         # Yield images separately if any found
                         # if images:
                         #     yield {"type": "tool_call", "text": "相关图片:"}
@@ -137,6 +140,8 @@ async def run_agent_workflow_async(
             print(f"Error processing output: {str(e)}")
 
     logger.info("Async workflow completed successfully")
+
+    # 最后返回最终报告
 
 
 async def recv_message_callback(open_id, chat_id, msg_id, content, recv_id_type):
@@ -156,6 +161,7 @@ async def recv_message_callback(open_id, chat_id, msg_id, content, recv_id_type)
         chat_id=chat_id,
         recv_id_type=recv_id_type,
     )
+    # After run workflow, create a final output to a doc and save to local.
 
 
 def run_lark_client():

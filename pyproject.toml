@@ -5,16 +5,22 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "langchain>=0.3.25",
-    "langgraph>=0.4.8",
+    "langchain>=0.3",
+    "langchain-community>=0.3",
+    "langchain-openai>=0.3",
+    "langchain-text-splitters>=0.3",
+    "langgraph>=0.4",
     "pytest>=8.4.0",
     "lark-oapi @ git+https://github.com/RiviaAzusa/oapi-sdk-python.git@v2_main",
     "aiosqlite>=0.21.0",
     "pytest-asyncio>=1.0.0",
     "httpx[socks]>=0.28.1",
-    "easylark",
     "python-socks>=2.7.1",
+    "faiss-cpu>=1.7.4",
+    "openai>=1.0.0",
+    "tiktoken>=0.5.0",
+    "dashscope",
+    "loguru>=0.7.3",
+    "langgraph-prebuilt>=0.2.2",
+    "langchain-qwq>=0.2.0",
 ]
-
-[tool.uv.sources]
-easylark = { git = "https://github.com/RiviaAzusa/EasyLark.git" }

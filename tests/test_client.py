@@ -26,6 +26,11 @@ async def pipeline():
         yield i
 
 
+async def recv_trigger(*args, **kwargs):
+    print("recv")
+    ...
+
+
 if __name__ == "__main__":
     client = LarkClient(
         app_id=os.getenv("LARK_APP_ID"),
@@ -50,5 +55,6 @@ if __name__ == "__main__":
         app_id=os.getenv("LARK_APP_ID"),
         app_secret=os.getenv("LARK_APP_SECRET"),
         callback_reply_message=recv_message_callback,
+        callback_card_action=recv_trigger,
     )
     ws_server.start()
