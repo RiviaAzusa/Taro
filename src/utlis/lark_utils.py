@@ -4,8 +4,6 @@ from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 from langgraph.graph.graph import CompiledGraph
 
 
-
-
 async def invoke_lark(
     agent: CompiledGraph,
     query: str,
@@ -51,11 +49,11 @@ async def invoke_lark(
                 if len(accumulated_content) >= chunk_size:
                     yields.append({"type": "text", "text": accumulated_content})
                     accumulated_content = ""
-            elif msg.additional_kwargs.get("reasoning_content"):
-                accumulated_content += msg.additional_kwargs.get("reasoning_content")
-                if len(accumulated_content) >= chunk_size:
-                    yields.append({"type": "text", "text": accumulated_content})
-                    accumulated_content = ""
+            # elif msg.additional_kwargs.get("reasoning_content"):
+            #     accumulated_content += msg.additional_kwargs.get("reasoning_content")
+            #     if len(accumulated_content) >= chunk_size:
+            #         yields.append({"type": "text", "text": accumulated_content})
+            #         accumulated_content = ""
 
             elif msg.tool_calls:
                 if accumulated_content:
