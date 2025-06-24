@@ -55,7 +55,7 @@ class LarkRunner:
     async def call_back_hello(
         self, open_id, chat_id, recv_id_id_type: Literal["open_id", "chat_id"]
     ):
-        card_content = '{"data":{"template_id":"AAqIOw1f3LPoL","template_version_name":"1.0.2"},"type":"template"}'
+        card_content = '{"data":{"template_id":"AAqIOw1f3LPoL","template_version_name":"1.0.3"},"type":"template"}'
         sent_id = open_id if recv_id_id_type == "open_id" else chat_id
         await self.lark_api.do_send_msg(
             sent_id, card_content, "interactive", recv_id_id_type
