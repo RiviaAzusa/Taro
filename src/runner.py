@@ -33,7 +33,10 @@ class LarkRunner:
 
         # 初始化飞书相关组件
         self.lark_api = EasyLarkAPI(
-            app_id=os.getenv("LARK_APP_ID"), app_secret=os.getenv("LARK_APP_SECRET")
+            app_id=os.getenv("LARK_APP_ID"),
+            app_secret=os.getenv("LARK_APP_SECRET"),
+            log_level="INFO",
+            auto_refresh=True,
         )
         self.lark_client = LarkClient(self.lark_api)
         self.lark_ws = None
